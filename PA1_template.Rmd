@@ -7,19 +7,102 @@ output:
 
 
 ## Loading and preprocessing the data
-
+```{r load_Data}
+data <- read.csv(unzip("activity.zip"), sep = ",")
+```
 
 
 ## What is mean total number of steps taken per day?
+```{r NA_ignored}
+library(dplyr)
+library(ggplot2)
+
+df <- data %>% group_by(date) %>% 
+  summarise(total.steps = sum(steps, na.rm = TRUE))
+
+qplot(df$total.steps, binwidth = 500, 
+      xlab = "Total Steps Each Day")
+```
+Mean number of steps taken each day
+```{r}
+mean(df$total.steps)
+```
+Median number of steps taken each day
+```{r}
+median(df$total.steps)
+```
 
 
 
 ## What is the average daily activity pattern?
+```{r steps_by_interval}
+library(ggplot2)
 
+daily.pattern <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
+
+plot <- ggplot(daily.pattern, aes(interval, steps)) + 
+  geom_line() + 
+  xlab("5 Minute Interval") + 
+  ylab("Average Steps Taken")
+print(plot)
+```
+5 minute interval with the maximum of steps in daily activity
+```{r interval_max_steps}
+daily.pattern[which.max(daily.pattern$steps),]
+
+```
 
 
 ## Imputing missing values
+Calculate total number of missing values in dataset
+```{r sum_NA}
+## Total NA's in dataset
+sum(is.na(data))
+```
+Here, missing values are replaced by the mean of that 5 minute interval.
+```{r replace_NA}
+indice <- which(is.na(data))
+steps.noNA <- data
 
+for(i in indice){
+  if(is.na(data$steps[i])){
+    steps.noNA$steps[i] <- daily.pattern$steps[steps.noNA$interval[i] == daily.pattern$interval]
+  }
+}
+```
+Plot histogram with dataset with the missing values filled in.
+```{r}
+library(ggplot2)
+total.noNA <- steps.noNA %>% group_by(date) %>% summarise(total = sum(steps))
 
+qplot(total.noNA$total, binwidth = 500, xlab = "Total Steps Each Day")
+```
+New mean of steps taken with missing values filled in
+```{r}
+mean(total.noNA$total)
+```
+New median of steps taken with missing values filled in
+```{r}
+median(total.noNA$total)
+```
+The mean and median values are seen to be higher than the original estimates. By imputing the missing data instead of removing them completely, as done in the original estimates, the total daily steps are recalculated to include days where values were missing.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+Categorize dates into factor variable.
+```{r weekdays}
+weekend <- c("Saturday", "Sunday")
+steps.noNA$day <- if_else(weekdays(steps.noNA$date) %in% weekend, "Weekend", "Weekday")
+steps.noNA$day <- factor(steps.noNA$day)
+```
+Plot weekday vs weekend panel plot.
+```{r}
+library(ggplot2)
+avg.steps <- aggregate(steps ~ interval + day, steps.noNA, mean)
+plot1 <- ggplot(avg.steps, aes(interval,steps)) + 
+  facet_grid(week ~ .) +
+  geom_line(aes(color = week)) +
+  xlab("5 Minute Interval") +
+  ylab("Average Steps Taken")
+
+print(plot1)
+```
