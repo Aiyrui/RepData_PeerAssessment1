@@ -7,37 +7,78 @@ output:
 
 
 ## Loading and preprocessing the data
-```{r load_Data}
+
+```r
 data <- read.csv(unzip("activity.zip"), sep = ",")
 ```
 
 
 ## What is mean total number of steps taken per day?
-```{r NA_ignored}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 
 df <- data %>% group_by(date) %>% 
   summarise(total.steps = sum(steps, na.rm = TRUE))
+```
 
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```r
 qplot(df$total.steps, binwidth = 500, 
       xlab = "Total Steps Each Day")
 ```
 
+![](PA1_template_files/figure-html/NA_ignored-1.png)<!-- -->
+
 Mean number of steps taken each day
-```{r}
+
+```r
 mean(df$total.steps)
 ```
 
+```
+## [1] 9354.23
+```
+
 Median number of steps taken each day
-```{r}
+
+```r
 median(df$total.steps)
+```
+
+```
+## [1] 10395
 ```
 
 
 
 ## What is the average daily activity pattern?
-```{r steps_by_interval}
+
+```r
 library(ggplot2)
 
 daily.pattern <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
@@ -49,22 +90,35 @@ plot <- ggplot(daily.pattern, aes(interval, steps)) +
 print(plot)
 ```
 
-5 minute interval with the maximum of steps in daily activity
-```{r interval_max_steps}
-daily.pattern[which.max(daily.pattern$steps),]
+![](PA1_template_files/figure-html/steps_by_interval-1.png)<!-- -->
 
+5 minute interval with the maximum of steps in daily activity
+
+```r
+daily.pattern[which.max(daily.pattern$steps),]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 
 
 ## Imputing missing values
 Calculate total number of missing values in dataset
-```{r sum_NA}
+
+```r
 ## Total NA's in dataset
 sum(is.na(data))
 ```
 
+```
+## [1] 2304
+```
+
 Here, missing values are replaced by the mean of that 5 minute interval.
-```{r replace_NA}
+
+```r
 indice <- which(is.na(data))
 steps.noNA <- data
 
@@ -76,30 +130,64 @@ for(i in indice){
 ```
 
 Plot histogram with dataset with the missing values filled in.
-```{r}
+
+```r
 library(ggplot2)
 total.noNA <- steps.noNA %>% group_by(date) %>% summarise(total = sum(steps))
+```
 
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```r
 qplot(total.noNA$total, binwidth = 500, xlab = "Total Steps Each Day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 New mean of steps taken with missing values filled in
-```{r}
+
+```r
 mean(total.noNA$total)
 ```
 
+```
+## [1] 10766.19
+```
+
 New median of steps taken with missing values filled in
-```{r}
+
+```r
 median(total.noNA$total)
+```
+
+```
+## [1] 10766.19
 ```
 
 The mean and median values are seen to be higher than the original estimates. By imputing the missing data instead of removing them completely, as done in the original estimates, the total daily steps are recalculated to include days where values were missing.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 Categorize dates into factor variable.
-```{r weekdays}
+
+```r
 library(dplyr)
 library(lubridate)
+```
+
+```
+## 
+## Attaching package: 'lubridate'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     date, intersect, setdiff, union
+```
+
+```r
 steps.noNA$date <- as_date(steps.noNA$date)
 weekend <- c("Saturday", "Sunday")
 steps.noNA$day <- if_else(weekdays(steps.noNA$date) %in% weekend, "Weekend", "Weekday")
@@ -107,7 +195,8 @@ steps.noNA$day <- factor(steps.noNA$day)
 ```
 
 Plot weekday vs weekend panel plot.
-```{r}
+
+```r
 library(ggplot2)
 avg.steps <- aggregate(steps ~ interval + day, steps.noNA, mean)
 plot1 <- ggplot(avg.steps, aes(interval,steps)) + 
@@ -118,3 +207,5 @@ plot1 <- ggplot(avg.steps, aes(interval,steps)) +
 
 print(plot1)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
