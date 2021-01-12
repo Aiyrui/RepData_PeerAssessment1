@@ -48,11 +48,16 @@ df <- data %>% group_by(date) %>%
 ```
 
 ```r
+png("plot1.png", width = 480, height = 480)
 qplot(df$total.steps, binwidth = 500, 
       xlab = "Total Steps Each Day")
+dev.off()
 ```
 
-![](PA1_template_files/figure-html/NA_ignored-1.png)<!-- -->
+```
+## png 
+##   2
+```
 
 Mean number of steps taken each day
 
@@ -83,14 +88,20 @@ library(ggplot2)
 
 daily.pattern <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
 
-plot <- ggplot(daily.pattern, aes(interval, steps)) + 
+plot2 <- ggplot(daily.pattern, aes(interval, steps)) + 
   geom_line() + 
   xlab("5 Minute Interval") + 
   ylab("Average Steps Taken")
-print(plot)
+
+png("plot2.png", width = 480, height = 480)
+print(plot2)
+dev.off()
 ```
 
-![](PA1_template_files/figure-html/steps_by_interval-1.png)<!-- -->
+```
+## png 
+##   2
+```
 
 5 minute interval with the maximum of steps in daily activity
 
@@ -141,10 +152,15 @@ total.noNA <- steps.noNA %>% group_by(date) %>% summarise(total = sum(steps))
 ```
 
 ```r
+png("plot3.png", width = 480, height = 480)
 qplot(total.noNA$total, binwidth = 500, xlab = "Total Steps Each Day")
+dev.off()
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+```
+## png 
+##   2
+```
 
 New mean of steps taken with missing values filled in
 
@@ -199,13 +215,18 @@ Plot weekday vs weekend panel plot.
 ```r
 library(ggplot2)
 avg.steps <- aggregate(steps ~ interval + day, steps.noNA, mean)
-plot1 <- ggplot(avg.steps, aes(interval,steps)) + 
+plot4 <- ggplot(avg.steps, aes(interval,steps)) + 
   facet_grid(day ~ .) +
   geom_line(aes(color = day)) +
   xlab("5 Minute Interval") +
   ylab("Average Steps Taken")
 
-print(plot1)
+png("plot4.png", width = 480, height = 480)
+print(plot4)
+dev.off()
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+```
+## png 
+##   2
+```

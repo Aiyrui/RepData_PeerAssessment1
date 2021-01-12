@@ -1,9 +1,5 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+"Reproducible Research: Peer Assessment 1"
+============================================
 
 
 ## Loading and preprocessing the data
@@ -42,11 +38,12 @@ library(ggplot2)
 
 daily.pattern <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
 
-plot <- ggplot(daily.pattern, aes(interval, steps)) + 
+plot2 <- ggplot(daily.pattern, aes(interval, steps)) + 
   geom_line() + 
   xlab("5 Minute Interval") + 
   ylab("Average Steps Taken")
-print(plot)
+
+print(plot2)
 ```
 
 5 minute interval with the maximum of steps in daily activity
@@ -110,11 +107,12 @@ Plot weekday vs weekend panel plot.
 ```{r}
 library(ggplot2)
 avg.steps <- aggregate(steps ~ interval + day, steps.noNA, mean)
-plot1 <- ggplot(avg.steps, aes(interval,steps)) + 
+plot4 <- ggplot(avg.steps, aes(interval,steps)) + 
   facet_grid(day ~ .) +
   geom_line(aes(color = day)) +
   xlab("5 Minute Interval") +
   ylab("Average Steps Taken")
 
-print(plot1)
+print(plot4)
+
 ```
